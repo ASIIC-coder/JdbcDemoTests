@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ahg.mapper.BrandMapper">
+
+    <!--
+        数据库表的字段名称 和 实体类的属性名称 不一样，则不能自动封装数据
+        * 起别名
+        *resultMap:
+        <id 主键映射、   result column映射>
+    -->
+    <resultMap id="brandResultMap" type="brandProduct">
+        <id column="product_id" property="id"/>
+
+    </resultMap>
+
+    <select id="selectAll" resultMap="brandResultMap">
+        select
+        *
+        from products;
+    </select>
+
+    <!--    <sql id="brandProduct_column">-->
+<!--       product_id AS id, name, quantity_in_stock ,unit_price-->
+<!--    </sql>-->
+<!--    <select id="selectAll" resultType="brandProduct">-->
+<!--        select<include refid="brandProduct_column"/>-->
+<!--            from products;-->
+
+<!--    </select>-->
+<!--
+    特殊字符处理：
+        1.转义
+        2.CDATA区
+
+-->
+    <select id="selectById" resultMap="brandResultMap">
+        select *
+        from products where product_id = #{id};
+    </select>
+    <!--条件查询-->
+<!--    <select id="selectByCondition" resultMap="brandResultMap">-->
+<!--        select *-->
+<!--        from products-->
+<!--        where-->
+<!--            name like #{name}-->
+<!--            and unit_price <![CDATA[-->
+<!--             <-->
+<!--            ]]> 2.0-->
+<!--    </select>-->
+
+    <!--
+    动态SQL条件查询
+        *if：条件判断
+            *test：逻辑表达式
+        *问题：
+            *恒等式
+            *<where>替换 where 关键字
+
+    -->
+    <select id="selectByCondition" resultMap="brandResultMap">
+        select *
+        from products
+        <where>
+
+            <if test="name != null ">
+                name like #{name}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectByConditionSingle" resultMap="brandResultMap">
+        select *
+        from products
+        where
+        <choose>
+            <when test="name != null">
+                name = #{chinese}
+            </when>
+        </choose>
+
+    </select>
+
+
+
+    <insert id="add">
+        insert into products(product_id, name, quantity_in_stock, unit_price)
+        values (#{id},#{name},#{quantity_in_stock},#{unit_price});
+    </insert>
+
+
+    <insert id="add2" useGeneratedKeys="true" keyProperty="id" >
+        insert into products(product_id, name, quantity_in_stock, unit_price)
+        values (#{id},#{name},#{quantity_in_stock},#{unit_price});
+    </insert>
+
+
+    <update id="update">
+        update products
+        <set>
+            product_id = #{id},
+            <if test="name != null and name != ''">
+            name = #{name},
+            </if>
+            <if test="quantity_in_stock != null and name != ''">
+            quantity_in_stock = #{quantity_in_stock},
+            </if>
+            <if test="unit_price != null">
+            unit_price = #{unit_price}
+            </if>
+        </set>
+        where product_id = #{id}
+    </update>
+
+</mapper>
